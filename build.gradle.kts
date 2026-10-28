@@ -1,10 +1,26 @@
-val kotlin_version: String by project
-val logback_version: String by project
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+val kotlin_version: String = project.findProperty("kotlin_version") as String
+val logback_version: String = project.findProperty("logback_version") as String
+
+kotlin {
+    compilerOptions {
+        // Keep bytecode compatible with the Docker runtime and CI (Java 21),
+        // even when building locally with a newer JDK.
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
+}
+
+java {
+    // Match the Kotlin jvmTarget so the fatJar runs on the Java 21 runtime.
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
 
 plugins {
-    kotlin("jvm") version "2.1.10"
-    id("io.ktor.plugin") version "3.1.1"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.10"
+    kotlin("jvm") version "2.4.21"
+    id("io.ktor.plugin") version "3.6.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.4.21"
 }
 
 group = "aquadx"
@@ -41,11 +57,11 @@ dependencies {
     configurations.configureEach {
         exclude(group = "ch.qos.logback", module = "logback-classic")
     }
-    runtimeOnly("org.tinylog:slf4j-tinylog:2.7.0")
-    implementation("org.tinylog:tinylog-impl:2.7.0")
+    runtimeOnly("org.tinylog:slf4j-tinylog:2.8.1")
+    implementation("org.tinylog:tinylog-impl:2.8.1")
 
     // JSON
-    implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.56")
+    implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.66")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
 }
